@@ -1,6 +1,7 @@
 package com.theapache64.tvplayground
 
 import android.os.Bundle
+import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
@@ -10,11 +11,13 @@ import timber.log.Timber
 class PlaygroundActivity : AppCompatActivity() {
 
 
+    private lateinit var binding: ActivityPlaygroundBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.plant(Timber.DebugTree())
 
-        val binding = DataBindingUtil.setContentView<ActivityPlaygroundBinding>(
+        this.binding = DataBindingUtil.setContentView<ActivityPlaygroundBinding>(
             this,
             R.layout.activity_playground
         )
@@ -26,6 +29,23 @@ class PlaygroundActivity : AppCompatActivity() {
             Timber.d("onCreate: Found ${channels.size} channels")
             binding.channelStack.setChannels(channels)
         })
+    }
 
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        Timber.d("onKeyDown: $keyCode")
+        when (keyCode) {
+            KeyEvent.KEYCODE_DPAD_UP -> {
+                binding.channelStack.channelUp()
+            }
+
+            KeyEvent.KEYCODE_DPAD_DOWN -> {
+                binding.channelStack.channelDown()
+            }
+
+            KeyEvent.KEYCODE_ENTER -> {
+                Timber.d("onKeyDown: Launch ${binding.channelStack.getActiveChannelFromUI()}")
+            }
+        }
+        return super.onKeyDown(keyCode, event)
     }
 }

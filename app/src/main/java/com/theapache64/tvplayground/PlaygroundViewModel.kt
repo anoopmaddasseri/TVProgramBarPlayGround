@@ -14,14 +14,14 @@ class PlaygroundViewModel : ViewModel() {
 
     init {
         _fakeChannels.value = mutableListOf<Channel>().apply {
-            repeat(30) {
+            repeat(300) {
                 add(
                     Channel(
                         "id-$it",
                         it,
-                        "https://picsum.photos/id/1$it/200/300",
-                        false,
-                        false
+                        "https://picsum.photos/id/$it/200/200",
+                        it == 0,
+                        it == 0
                     )
                 )
             }

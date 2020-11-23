@@ -41,6 +41,20 @@
     "name": "Timber",
     "description": "No-nonsense injectable logging."
    }
+  },
+  {
+   "id": 4,
+   "type": "implementation",
+   "installed_name": "gravitysnaphelper",
+   "gpm_dep": {
+    "artifact_id": "gravitysnaphelper",
+    "default_type": "implementation",
+    "docs": "https://mvnrepository.com/artifact/com.github.rubensousa/gravitysnaphelper",
+    "get_from": "Central",
+    "group_id": "com.github.rubensousa",
+    "name": "GravitySnapHelper",
+    "description": "A SnapHelper that snaps the RecyclerView to an edge"
+   }
   }
  ]
 }
