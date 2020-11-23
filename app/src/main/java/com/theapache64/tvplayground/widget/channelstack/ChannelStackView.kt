@@ -2,9 +2,11 @@ package com.theapache64.tvplayground.widget.channelstack
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.Gravity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader
+import com.bumptech.glide.util.FixedPreloadSizeProvider
 
 /**
  * Created by theapache64 : Nov 20 Fri,2020 @ 17:43
@@ -27,9 +29,12 @@ class ChannelStackView @JvmOverloads constructor(
     }
 
 
-    fun setChannels(channels: List<Channel>) {
+    fun setupChannels(context: Context, channels: List<Channel>) {
+
         // since we're reversed the layout, we need to reverse the channels to maintain the order
-        channelStackAdapter = ChannelStackAdapter(channels.reversed().toMutableList())
+        channelStackAdapter = ChannelStackAdapter(context, channels.reversed().toMutableList())
+        setupPreloading()
+
         this.adapter = channelStackAdapter
 
         // Scroll to active middle item
@@ -40,7 +45,23 @@ class ChannelStackView @JvmOverloads constructor(
         // At this point, both view position are same,because channelUp/Down didn't happen
         prevViewPosition = currentViewPosition
 
+        // Scrolling to mid position
         llm.scrollToPositionWithOffset(currentViewPosition, 0)
+
+    }
+
+    private fun setupPreloading() {
+        val preLoadSizeProvider = FixedPreloadSizeProvider<Channel>(
+            256,
+            256
+        )
+        val preLoader = RecyclerViewPreloader(
+            Glide.with(this),
+            channelStackAdapter!!,
+            preLoadSizeProvider,
+            50
+        )
+        addOnScrollListener(preLoader)
     }
 
     /**

@@ -55,6 +55,20 @@
     "name": "GravitySnapHelper",
     "description": "A SnapHelper that snaps the RecyclerView to an edge"
    }
+  },
+  {
+   "id": 5,
+   "type": "implementation",
+   "installed_name": "recyclerview-integration",
+   "gpm_dep": {
+    "artifact_id": "recyclerview-integration",
+    "default_type": "implementation",
+    "docs": "https://mvnrepository.com/artifact/com.github.bumptech.glide/recyclerview-integration",
+    "get_from": "Central",
+    "group_id": "com.github.bumptech.glide",
+    "name": "Glide RecyclerView Integration",
+    "description": "An integration library to display images in RecyclerView."
+   }
   }
  ]
 }

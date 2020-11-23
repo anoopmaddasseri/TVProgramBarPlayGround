@@ -27,7 +27,7 @@ class PlaygroundActivity : AppCompatActivity() {
 
         viewModel.fakeChannels.observe(this, { channels ->
             Timber.d("onCreate: Found ${channels.size} channels")
-            binding.channelStack.setChannels(channels)
+            binding.channelStack.setupChannels(this, channels)
         })
     }
 

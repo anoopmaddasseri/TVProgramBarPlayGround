@@ -45,4 +45,9 @@ dependencies {
 
     // Timber : No-nonsense injectable logging.
     implementation 'com.jakewharton.timber:timber:4.7.1'
+
+    // Glide RecyclerView Integration : An integration library to display images in RecyclerView.
+    implementation ('com.github.bumptech.glide:recyclerview-integration:4.11.0'){
+        transitive = false
+    }
 }
