@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader
-import com.bumptech.glide.util.FixedPreloadSizeProvider
+import com.bumptech.glide.util.ViewPreloadSizeProvider
 
 /**
  * Created by theapache64 : Nov 20 Fri,2020 @ 17:43
@@ -15,24 +15,35 @@ class ChannelStackView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : RecyclerView(context, attrs, defStyleAttr) {
 
+    companion object {
+        private const val PRELOAD_COUNT = 50
+    }
+
     private var currentViewPosition: Int = -1
     private var prevViewPosition: Int = -1
     private var channelStackAdapter: ChannelStackAdapter? = null
-
-    init {
-        layoutManager = LinearLayoutManager(context)
-        itemAnimator = null
-    }
+    var callback: Callback? = null
 
     private val llm by lazy {
         layoutManager as LinearLayoutManager
     }
 
 
-    fun setupChannels(context: Context, channels: List<Channel>) {
+    private val preLoadSizeProvider by lazy {
+        ViewPreloadSizeProvider<Channel>()
+    }
+
+
+    init {
+        layoutManager = LinearLayoutManager(context)
+        itemAnimator = null
+    }
+
+    fun setupChannels(channels: List<Channel>) {
 
         // since we're reversed the layout, we need to reverse the channels to maintain the order
-        channelStackAdapter = ChannelStackAdapter(context, channels.reversed().toMutableList())
+        channelStackAdapter =
+            ChannelStackAdapter(context, preLoadSizeProvider, channels.reversed().toMutableList())
         setupPreloading()
 
         this.adapter = channelStackAdapter
@@ -50,17 +61,25 @@ class ChannelStackView @JvmOverloads constructor(
 
     }
 
+    /**
+     * Setup Glide preloading
+     */
     private fun setupPreloading() {
-        val preLoadSizeProvider = FixedPreloadSizeProvider<Channel>(
-            256,
-            256
-        )
+
+        // To recycle image
+        setRecyclerListener {
+            channelStackAdapter?.glideRequests?.clear(
+                (it as ChannelStackAdapter.ViewHolder).binding.ivChannelLogo
+            )
+        }
+
         val preLoader = RecyclerViewPreloader(
             Glide.with(this),
             channelStackAdapter!!,
             preLoadSizeProvider,
-            50
+            PRELOAD_COUNT
         )
+        setItemViewCacheSize(0)
         addOnScrollListener(preLoader)
     }
 
@@ -93,12 +112,14 @@ class ChannelStackView @JvmOverloads constructor(
         prevViewPosition = currentViewPosition
         llm.scrollToPositionWithOffset(++currentViewPosition, 0)
         updateAdapter()
+        fireChannelChanged()
     }
 
     fun channelDown() {
         prevViewPosition = currentViewPosition
         llm.scrollToPositionWithOffset(--currentViewPosition, 0)
         updateAdapter()
+        fireChannelChanged()
     }
 
 
@@ -122,12 +143,26 @@ class ChannelStackView @JvmOverloads constructor(
      *
      * @return Channel
      */
-    fun getActiveChannelFromUI(): Channel? {
+    private fun getActiveChannelFromUI(): Channel? {
         return channelStackAdapter?.channels?.get(
             channelStackAdapter?.getListPositionFrom(
                 currentViewPosition
             ) ?: 0
         )
+    }
+
+    fun getActiveChannel(): Channel? {
+        return channelStackAdapter?.channels?.find { it.isActive }
+    }
+
+    fun fireChannelChanged() {
+        getActiveChannel()?.let {
+            callback?.onChannelChanged(it)
+        }
+    }
+
+    interface Callback {
+        fun onChannelChanged(channel: Channel)
     }
 
 }

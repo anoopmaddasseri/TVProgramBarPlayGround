@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.theapache64.tvplayground.databinding.ActivityPlaygroundBinding
+import com.theapache64.tvplayground.widget.channelstack.Channel
+import com.theapache64.tvplayground.widget.channelstack.ChannelStackView
 import timber.log.Timber
 
 class PlaygroundActivity : AppCompatActivity() {
@@ -27,8 +29,15 @@ class PlaygroundActivity : AppCompatActivity() {
 
         viewModel.fakeChannels.observe(this, { channels ->
             Timber.d("onCreate: Found ${channels.size} channels")
-            binding.channelStack.setupChannels(this, channels)
+            binding.channelStack.setupChannels(channels)
         })
+
+        // Setting channelstack callback
+        binding.channelStack.callback = object : ChannelStackView.Callback {
+            override fun onChannelChanged(channel: Channel) {
+                Timber.d("onChannelChanged: Channel changed to ${channel.imageUrl}")
+            }
+        }
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
@@ -43,9 +52,11 @@ class PlaygroundActivity : AppCompatActivity() {
             }
 
             KeyEvent.KEYCODE_ENTER -> {
-                Timber.d("onKeyDown: Launch ${binding.channelStack.getActiveChannelFromUI()}")
+                Timber.d("onKeyDown: Launch ${binding.channelStack.getActiveChannel()}")
             }
         }
         return super.onKeyDown(keyCode, event)
     }
+
+
 }
