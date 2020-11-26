@@ -155,7 +155,7 @@ class ChannelStackView @JvmOverloads constructor(
         return channelStackAdapter?.channels?.find { it.isActive }
     }
 
-    fun fireChannelChanged() {
+    private fun fireChannelChanged() {
         getActiveChannel()?.let {
             callback?.onChannelChanged(it)
         }

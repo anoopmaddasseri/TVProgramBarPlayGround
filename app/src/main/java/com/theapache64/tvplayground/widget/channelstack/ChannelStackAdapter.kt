@@ -30,12 +30,15 @@ class ChannelStackAdapter(
     }
 
     private val layoutInflater by lazy { LayoutInflater.from(context) }
+
+    // Glide things
     private var fullRequest: GlideRequest<Drawable>
     private var thumbRequest: GlideRequest<Drawable>
     val glideRequests = GlideApp.with(context)
 
     init {
 
+        // Creating glide request managers
         fullRequest = glideRequests
             .asDrawable()
 
@@ -53,6 +56,7 @@ class ChannelStackAdapter(
                 false
             )
         ).apply {
+            // Informing glide pre-loader about the viewport size
             preloadSizeProvider.setView(binding.ivChannelLogo)
         }
     }
