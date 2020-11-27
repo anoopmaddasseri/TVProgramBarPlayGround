@@ -14,6 +14,10 @@ class PlaygroundActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPlaygroundBinding
 
+    private val chStack by lazy {
+        binding.channelStack
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.plant(Timber.DebugTree())
@@ -28,7 +32,7 @@ class PlaygroundActivity : AppCompatActivity() {
     }
 
     private fun attachCallbacks() {
-        binding.channelStack.onChannelChange = object : ChannelStackView.OnChannelChange {
+        chStack.onChannelChange = object : ChannelStackView.OnChannelChange {
             // Invoked when channel changed using DPAD Up/Down
             override fun onChannelFocusChange(channel: Channel) {
                 Timber.d("onChannelChanged: Channel changed to ${channel.imageUrl}")
@@ -44,7 +48,7 @@ class PlaygroundActivity : AppCompatActivity() {
     private fun attachObservers(viewModel: PlaygroundViewModel) {
         viewModel.fakeChannels.observe(this, { channels ->
             Timber.d("onCreate: Found ${channels.size} channels")
-            binding.channelStack.setupChannels(channels)
+            chStack.setupChannels(channels)
         })
     }
 
@@ -52,15 +56,16 @@ class PlaygroundActivity : AppCompatActivity() {
         Timber.d("onKeyDown: $keyCode")
         when (keyCode) {
             KeyEvent.KEYCODE_DPAD_UP -> {
-                binding.channelStack.channelFocusUp()
+                chStack.channelFocusUp()
             }
 
             KeyEvent.KEYCODE_DPAD_DOWN -> {
-                binding.channelStack.channelFocusDown()
+                chStack.channelFocusDown()
             }
 
             KeyEvent.KEYCODE_ENTER -> {
-                Timber.d("onKeyDown: Launch ${binding.channelStack.getActiveChannel()}")
+                Timber.d("onKeyDown: Launch ${chStack.getActiveChannel()}")
+                chStack.selectChannel()
             }
         }
         return super.onKeyDown(keyCode, event)
@@ -70,11 +75,11 @@ class PlaygroundActivity : AppCompatActivity() {
         Timber.d("keyCode: $keyCode")
         when (keyCode) {
             KeyEvent.KEYCODE_PAGE_UP, KeyEvent.KEYCODE_CHANNEL_UP -> {
-                binding.channelStack.channelUp()
+                chStack.channelUp()
             }
 
             KeyEvent.KEYCODE_PAGE_DOWN, KeyEvent.KEYCODE_CHANNEL_DOWN -> {
-                binding.channelStack.channelDown()
+                chStack.channelDown()
             }
         }
         return super.onKeyDown(keyCode, event)

@@ -22,8 +22,8 @@ class ChannelStackView @JvmOverloads constructor(
     }
 
     // Focused channel state
-    private var currentViewPosition: Int = NO_POSITION
     private var prevViewPosition: Int = NO_POSITION
+    private var currentViewPosition: Int = NO_POSITION
 
     // Playing channel state
     private var currentPlayingPosition: Int = NO_POSITION
@@ -152,6 +152,20 @@ class ChannelStackView @JvmOverloads constructor(
     }
 
     /**
+     * To select currently focused / jump to channel
+     */
+    fun selectChannel(channel: Channel? = null) {
+        // TODO: 27-11-2020 Jump to channel redirection
+        if (currentPlayingPosition != currentViewPosition) {
+            prevPlayingPosition = currentPlayingPosition
+            // Select currently focused channel
+            currentPlayingPosition = currentViewPosition
+            updateAdapterPlayingChannel()
+            firePlayingChannelChanged()
+        }
+    }
+
+    /**
      * Called during initial channel setup
      */
     fun setupChannels(channels: List<Channel>) {
@@ -166,11 +180,9 @@ class ChannelStackView @JvmOverloads constructor(
         llm.reverseLayout = true
 
         currentViewPosition = getCurrentIndexInMiddle()
-        currentPlayingPosition = currentViewPosition
 
         // At this point, both view position are same, because channelUp/Down didn't happen
-        prevViewPosition = currentViewPosition
-        prevPlayingPosition = currentViewPosition
+        currentPlayingPosition = currentViewPosition
 
         // Scrolling to mid position
         llm.scrollToPositionWithOffset(currentViewPosition, OFFSET_DEFAULT)
@@ -190,7 +202,9 @@ class ChannelStackView @JvmOverloads constructor(
         prevChannel.isActive = false
 
         // Now update UI
-        channelStackAdapter?.notifyItemChanged(prevViewPosition)
+        if (prevViewPosition > NO_POSITION) {
+            channelStackAdapter?.notifyItemChanged(prevViewPosition)
+        }
         channelStackAdapter?.notifyItemChanged(currentViewPosition)
     }
 
