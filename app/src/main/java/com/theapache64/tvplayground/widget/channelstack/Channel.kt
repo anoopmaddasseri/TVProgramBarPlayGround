@@ -8,5 +8,5 @@ data class Channel(
     val no: Int,
     val imageUrl: String,
     var isActive: Boolean,
-    val isPlaying: Boolean
+    var isPlaying: Boolean
 )

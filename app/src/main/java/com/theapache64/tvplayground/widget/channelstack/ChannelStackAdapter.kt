@@ -37,7 +37,6 @@ class ChannelStackAdapter(
     val glideRequests = GlideApp.with(context)
 
     init {
-
         // Creating glide request managers
         fullRequest = glideRequests
             .asDrawable()
@@ -73,16 +72,24 @@ class ChannelStackAdapter(
 
     override fun getItemCount(): Int = Int.MAX_VALUE
 
-
     inner class ViewHolder(val binding: ItemChannelStackBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(channel: Channel) {
             binding.channel = channel
 
+            // Focused channel UI state
             if (channel.isActive) {
                 binding.root.setBackgroundColor(Color.RED)
-            } else {
+            }
+
+            // Playing channel focus UI state
+            if (channel.isPlaying) {
+                binding.root.setBackgroundColor(Color.BLUE)
+            }
+
+            // Default channel state
+            if (channel.isPlaying.not() && channel.isActive.not()) {
                 binding.root.setBackgroundColor(Color.TRANSPARENT)
             }
 
