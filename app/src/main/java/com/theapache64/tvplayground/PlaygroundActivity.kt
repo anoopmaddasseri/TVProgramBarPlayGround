@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.theapache64.tvplayground.databinding.ActivityPlaygroundBinding
 import com.theapache64.tvplayground.widget.channelstack.Channel
 import com.theapache64.tvplayground.widget.channelstack.ChannelStackView
+import com.theapache64.tvplayground.widget.channelstack.ChannelStackView.StateChStack.STATE_CH_STACK_VISIBLE
 import timber.log.Timber
 
 class PlaygroundActivity : AppCompatActivity() {
@@ -58,14 +59,17 @@ class PlaygroundActivity : AppCompatActivity() {
             KeyEvent.KEYCODE_DPAD_UP -> {
                 chStack.channelFocusUp()
             }
-
             KeyEvent.KEYCODE_DPAD_DOWN -> {
-                chStack.channelFocusDown()
+                if (chStack.currentState == STATE_CH_STACK_VISIBLE) {
+                    chStack.channelFocusDown()
+                } else {
+                    chStack.show()
+                }
             }
 
             KeyEvent.KEYCODE_ENTER -> {
                 Timber.d("onKeyDown: Launch ${chStack.getActiveChannel()}")
-                chStack.selectChannel()
+                chStack.selectFocusedChannel()
             }
         }
         return super.onKeyDown(keyCode, event)

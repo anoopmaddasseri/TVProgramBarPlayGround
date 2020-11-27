@@ -2,6 +2,7 @@ package com.theapache64.tvplayground.widget.channelstack
 
 import android.content.Context
 import android.util.AttributeSet
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -19,6 +20,10 @@ class ChannelStackView @JvmOverloads constructor(
         // Glide channel icon preload count
         private const val PRELOAD_COUNT = 50
         private const val OFFSET_DEFAULT = 0
+
+        // Stack show / hide
+        private const val FADE_IN_DURATION = 500L
+        private const val FADE_OUT_DURATION = 200L
     }
 
     // Focused channel state
@@ -31,6 +36,14 @@ class ChannelStackView @JvmOverloads constructor(
 
     // Channel events
     var onChannelChange: OnChannelChange? = null
+
+    // Channel stack state
+    var currentState = StateChStack.STATE_CH_STACK_GONE
+
+    enum class StateChStack {
+        STATE_CH_STACK_VISIBLE,
+        STATE_CH_STACK_GONE
+    }
 
     // Component init goes here 👇
     private var channelStackAdapter: ChannelStackAdapter? = null
@@ -128,6 +141,7 @@ class ChannelStackView @JvmOverloads constructor(
     fun channelUp() {
         prevPlayingPosition = currentPlayingPosition
         llm.scrollToPositionWithOffset(++currentPlayingPosition, OFFSET_DEFAULT)
+        adjustChannelFocusState()
         updateAdapterPlayingChannel()
         firePlayingChannelChanged()
     }
@@ -138,31 +152,68 @@ class ChannelStackView @JvmOverloads constructor(
     fun channelDown() {
         prevPlayingPosition = currentPlayingPosition
         llm.scrollToPositionWithOffset(--currentPlayingPosition, OFFSET_DEFAULT)
+        adjustChannelFocusState()
         updateAdapterPlayingChannel()
         firePlayingChannelChanged()
     }
 
     /**
-     * Adjust channel focus state when playing channel change
+     * Adjust channel focus state w.r.t to playing channel change
      */
     private fun adjustChannelFocusState() {
-        prevViewPosition = prevPlayingPosition
+        prevViewPosition = currentViewPosition
         currentViewPosition = currentPlayingPosition
         updateAdapterChannelFocus()
     }
 
     /**
-     * To select currently focused / jump to channel
+     * To select currently focused channel
      */
-    fun selectChannel(channel: Channel? = null) {
-        // TODO: 27-11-2020 Jump to channel redirection
-        if (currentPlayingPosition != currentViewPosition) {
+    fun selectFocusedChannel() {
+        if (currentViewPosition != currentPlayingPosition) {
             prevPlayingPosition = currentPlayingPosition
             // Select currently focused channel
             currentPlayingPosition = currentViewPosition
             updateAdapterPlayingChannel()
             firePlayingChannelChanged()
         }
+    }
+
+    /**
+     * To show channel stack
+     */
+    fun show() {
+        isVisible = true
+        animate().cancel()
+        animate().alpha(1f).duration = FADE_IN_DURATION
+        currentState = StateChStack.STATE_CH_STACK_VISIBLE
+    }
+
+    /**
+     * To hide channel stack
+     */
+    fun hide() {
+        isVisible = false
+        animate().cancel()
+        animate().alpha(0f).duration = FADE_OUT_DURATION
+        animate().withEndAction {
+            isVisible = false
+            currentState = StateChStack.STATE_CH_STACK_GONE
+        }
+    }
+
+    /**
+     * To toggle channel stack visibility
+     */
+    fun toggle() {
+        if (isVisible) hide() else show()
+    }
+
+    /**
+     * Jump to channel
+     */
+    fun selectChannel(channel: Channel) {
+        TODO("Jump to channel")
     }
 
     /**

@@ -27,6 +27,14 @@ android {
     buildFeatures {
         dataBinding true
     }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -47,7 +55,7 @@ dependencies {
     implementation 'com.jakewharton.timber:timber:4.7.1'
 
     // Glide RecyclerView Integration : An integration library to display images in RecyclerView.
-    implementation ('com.github.bumptech.glide:recyclerview-integration:4.11.0'){
+    implementation('com.github.bumptech.glide:recyclerview-integration:4.11.0') {
         transitive = false
     }
     kapt 'com.github.bumptech.glide:compiler:4.11.0'
