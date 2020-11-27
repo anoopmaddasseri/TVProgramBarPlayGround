@@ -29,9 +29,8 @@ class ChannelStackView @JvmOverloads constructor(
     private var currentPlayingPosition: Int = NO_POSITION
     private var prevPlayingPosition: Int = NO_POSITION
 
-    // Major channel events
-    var onChannelFocusChange: OnChannelFocusChange? = null
-    var onPlayingChannelChange: OnPlayingChannelChange? = null
+    // Channel events
+    var onChannelChange: OnChannelChange? = null
 
     // Component init goes here 👇
     private var channelStackAdapter: ChannelStackAdapter? = null
@@ -240,28 +239,25 @@ class ChannelStackView @JvmOverloads constructor(
 
     private fun fireChannelFocusChanged() {
         getActiveChannel()?.let {
-            onChannelFocusChange?.onChannelFocusChange(it)
+            onChannelChange?.onChannelFocusChange(it)
         }
     }
 
     private fun firePlayingChannelChanged() {
         getPlayingChannel()?.let {
-            onPlayingChannelChange?.onPlayingChannelChange(it)
+            onChannelChange?.onPlayingChannelChange(it)
         }
     }
 
-    interface OnChannelFocusChange {
+    interface OnChannelChange {
         /**
          * Invoked when channel changed using DPAD Up/Down
          */
         fun onChannelFocusChange(channel: Channel)
-    }
 
-    interface OnPlayingChannelChange {
         /**
          * Invoked when channel changed using CH Up/Down
          */
         fun onPlayingChannelChange(channel: Channel)
     }
-
 }

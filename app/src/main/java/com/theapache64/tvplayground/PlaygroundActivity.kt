@@ -28,20 +28,17 @@ class PlaygroundActivity : AppCompatActivity() {
     }
 
     private fun attachCallbacks() {
-        // Invoked when channel changed using DPAD Up/Down
-        binding.channelStack.onChannelFocusChange = object : ChannelStackView.OnChannelFocusChange {
+        binding.channelStack.onChannelChange = object : ChannelStackView.OnChannelChange {
+            // Invoked when channel changed using DPAD Up/Down
             override fun onChannelFocusChange(channel: Channel) {
                 Timber.d("onChannelChanged: Channel changed to ${channel.imageUrl}")
             }
-        }
 
-        // Invoked when channel changed using CH Up/Down
-        binding.channelStack.onPlayingChannelChange =
-            object : ChannelStackView.OnPlayingChannelChange {
-                override fun onPlayingChannelChange(channel: Channel) {
-                    Timber.d("OnPlayingChannelChange: Playing Channel changed to ${channel.imageUrl}")
-                }
+            // Invoked when channel changed using CH Up/Down
+            override fun onPlayingChannelChange(channel: Channel) {
+                Timber.d("OnPlayingChannelChange: Playing Channel changed to ${channel.imageUrl}")
             }
+        }
     }
 
     private fun attachObservers(viewModel: PlaygroundViewModel) {
