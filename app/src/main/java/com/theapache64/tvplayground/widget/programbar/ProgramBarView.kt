@@ -135,7 +135,7 @@ class ProgramBarView @JvmOverloads constructor(
      * Gain focus back to program bar
      */
     private fun gainFocus() {
-        if (hasFocus().not()) requestFocus()
+        if (hasFocus().not()) requestChildFocus()
     }
 
     private fun canMovePrev() =
@@ -162,9 +162,7 @@ class ProgramBarView @JvmOverloads constructor(
         animate().cancel()
         animate().alpha(1f).duration = FADE_IN_DURATION
         currentState = StateProgramStack.STATE_PGM_STACK_VISIBLE
-
-        // Get focus back if no focus already
-        if (hasFocus().not()) requestChildFocus()
+        gainFocus()
     }
 
     /**
