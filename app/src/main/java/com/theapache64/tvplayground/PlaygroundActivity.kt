@@ -19,6 +19,10 @@ class PlaygroundActivity : AppCompatActivity() {
         binding.channelStack
     }
 
+    private val programBar by lazy {
+        binding.programBar
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.plant(Timber.DebugTree())
@@ -30,6 +34,9 @@ class PlaygroundActivity : AppCompatActivity() {
 
         attachObservers(viewModel)
         attachCallbacks()
+
+        // Request to fetch fake programs
+        viewModel.fetchFakePrograms()
     }
 
     private fun attachCallbacks() {
@@ -48,8 +55,13 @@ class PlaygroundActivity : AppCompatActivity() {
 
     private fun attachObservers(viewModel: PlaygroundViewModel) {
         viewModel.fakeChannels.observe(this, { channels ->
-            Timber.d("onCreate: Found ${channels.size} channels")
+            Timber.d("fakeChannels: Found ${channels.size} channels")
             chStack.setupChannels(channels)
+        })
+
+        viewModel.fakePrograms.observe(this, { programs ->
+            Timber.d("fakePrograms: Found ${programs.size} programs")
+            programBar.setupPrograms(programs)
         })
     }
 
@@ -59,12 +71,22 @@ class PlaygroundActivity : AppCompatActivity() {
             KeyEvent.KEYCODE_DPAD_UP -> {
                 chStack.channelFocusUp()
             }
+
             KeyEvent.KEYCODE_DPAD_DOWN -> {
                 if (chStack.currentState == STATE_CH_STACK_VISIBLE) {
                     chStack.channelFocusDown()
                 } else {
                     chStack.show()
+                    programBar.show()
                 }
+            }
+
+            KeyEvent.KEYCODE_DPAD_LEFT -> {
+                programBar.moveToPrevProgram()
+            }
+
+            KeyEvent.KEYCODE_DPAD_RIGHT -> {
+                programBar.moveToNextProgram()
             }
 
             KeyEvent.KEYCODE_ENTER -> {

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="click_animation_duration">100</integer>
+    <integer name="scale_in_animation_duration">300</integer>
+    <integer name="scale_out_animation_duration">100</integer>
+</resources>

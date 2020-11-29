@@ -16,12 +16,27 @@
         android:background="#2A2C2C"
         tools:context=".PlaygroundActivity">
 
+        <com.theapache64.tvplayground.widget.programbar.ProgramBarView
+            android:id="@+id/program_bar"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:alpha="0"
+            android:background="@android:color/transparent"
+            android:clipToPadding="false"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:numberOfRows="1" />
+
         <com.theapache64.tvplayground.widget.channelstack.ChannelStackView
             android:id="@+id/channel_stack"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:alpha="0"
             android:clipToPadding="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
             android:paddingBottom="50dp"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
