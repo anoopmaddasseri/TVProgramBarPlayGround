@@ -49,6 +49,10 @@ class ProgramBarView @JvmOverloads constructor(
     // Interception
     var activityCaptureTime = 0L
 
+    // Misc
+    private val mPrograms: List<Program>?
+        get() = programBarAdapter?.programs
+
     enum class StateProgramStack {
         STATE_PGM_STACK_VISIBLE,
         STATE_PGM_STACK_GONE
@@ -71,21 +75,21 @@ class ProgramBarView @JvmOverloads constructor(
      * To get active program (focused program)
      */
     fun getActiveProgram(): Program? {
-        return programBarAdapter?.programs?.find { it.isActive }
+        return mPrograms?.find { it.isActive }
     }
 
     /**
      * To get active program (focused program) from UI
      */
     private fun getActiveProgramFromUI(): Program? {
-        return programBarAdapter?.programs?.get(currentViewPosition)
+        return mPrograms?.get(currentViewPosition)
     }
 
     /**
      * To get currently playing program
      */
     private fun getPlayingProgram(): Program? {
-        return programBarAdapter?.programs?.find { it.isPlaying }
+        return mPrograms?.find { it.isPlaying }
     }
 
     /**
@@ -93,12 +97,7 @@ class ProgramBarView @JvmOverloads constructor(
      *
      */
     private fun getCurrentIndexInMiddle(): Int {
-        if (programBarAdapter != null) {
-            val playingProgramIndex =
-                programBarAdapter!!.programs.size.div(2)
-            if (playingProgramIndex != NO_POSITION) return playingProgramIndex
-        }
-        return OFFSET_DEFAULT
+        return mPrograms?.count()?.div(2) ?: OFFSET_DEFAULT
     }
 
     /**
@@ -128,7 +127,7 @@ class ProgramBarView @JvmOverloads constructor(
     }
 
     private fun canMoveNext() =
-        currentViewPosition.inc() < programBarAdapter?.itemCount ?: OFFSET_DEFAULT && allowKeyEvent()
+        currentViewPosition.inc() < mPrograms?.count() ?: OFFSET_DEFAULT && allowKeyEvent()
 
     private fun canMovePrev() =
         currentViewPosition > OFFSET_DEFAULT && allowKeyEvent()
@@ -222,7 +221,7 @@ class ProgramBarView @JvmOverloads constructor(
 
         // Active middle program TODO: 29-11-2020 'On Now' program whilst actual implementation
         if (currentViewPosition > OFFSET_DEFAULT) {
-            programBarAdapter!!.programs[currentViewPosition].isActive = true
+            mPrograms!![currentViewPosition].isActive = true
         }
 
         // At this point, both view position are same, because channelUp/Down didn't happen
@@ -241,7 +240,7 @@ class ProgramBarView @JvmOverloads constructor(
      */
     private fun updateAdapterProgramFocus() {
         val activeProgram = getActiveProgramFromUI()
-        val prevProgram = programBarAdapter!!.programs[prevViewPosition]
+        val prevProgram = mPrograms!![prevViewPosition]
 
         activeProgram?.isActive = true
         prevProgram.isActive = false
@@ -251,7 +250,7 @@ class ProgramBarView @JvmOverloads constructor(
      * Called to change the playing program
      */
     private fun updateAdapterPlayingChannel(activeProgram: Program) {
-        val prevProgram = programBarAdapter!!.programs[prevPlayingPosition]
+        val prevProgram = mPrograms!![prevPlayingPosition]
 
         // Update model first
         activeProgram.isPlaying = true
