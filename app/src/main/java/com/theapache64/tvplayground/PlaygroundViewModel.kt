@@ -40,8 +40,8 @@ class PlaygroundViewModel : ViewModel() {
                         "Pgm-$it",
                         it,
                         "https://picsum.photos/id/$it/200/200",
-                        it == 0,
-                        it == 0
+                        isActive = false,
+                        isPlaying = false
                     )
                 )
             }

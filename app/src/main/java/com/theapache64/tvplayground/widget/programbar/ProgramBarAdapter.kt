@@ -24,7 +24,8 @@ import com.theapache64.tvplayground.utils.GlideRequest
 class ProgramBarAdapter(
     private val context: Context,
     private val preloadSizeProvider: ViewPreloadSizeProvider<Program>,
-    val programs: MutableList<Program>
+    val programs: MutableList<Program>,
+    var onProgramSelected: (position: Int, program: Program) -> Unit
 ) : RecyclerView.Adapter<ProgramBarAdapter.ViewHolder>(),
     ListPreloader.PreloadModelProvider<Program> {
 
@@ -65,28 +66,24 @@ class ProgramBarAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, viewPosition: Int) {
-        val channel = programs[holder.layoutPosition]
-        holder.bind(channel)
+        val program = programs[holder.layoutPosition]
+        holder.bind(holder.layoutPosition, program)
     }
 
     inner class ViewHolder(val binding: ItemProgramBarBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(program: Program) {
+        fun bind(pos: Int, program: Program) {
             binding.program = program
-
-            if (program.isActive) {
-                // TODO: 29-11-2020 Handle active state
-            }
-
-            if (program.isPlaying) {
-                // TODO: 29-11-2020 Playing program appearance goes here
-            }
 
             // Load image
             fullRequest.load(program.imageUrl)
                 .thumbnail(thumbRequest.load(program.imageUrl))
                 .into(binding.ivProgramLogo)
+
+            binding.clProgramBar.setOnClickListener {
+                onProgramSelected(pos, program)
+            }
         }
 
         fun onFocusRequestReceived() {

@@ -6,9 +6,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.theapache64.tvplayground.databinding.ActivityPlaygroundBinding
+import com.theapache64.tvplayground.utils.toast
 import com.theapache64.tvplayground.widget.channelstack.Channel
 import com.theapache64.tvplayground.widget.channelstack.ChannelStackView
 import com.theapache64.tvplayground.widget.channelstack.ChannelStackView.StateChStack.STATE_CH_STACK_VISIBLE
+import com.theapache64.tvplayground.widget.programbar.Program
+import com.theapache64.tvplayground.widget.programbar.ProgramBarView
 import timber.log.Timber
 
 class PlaygroundActivity : AppCompatActivity() {
@@ -43,12 +46,23 @@ class PlaygroundActivity : AppCompatActivity() {
         chStack.onChannelChange = object : ChannelStackView.OnChannelChange {
             // Invoked when channel changed using DPAD Up/Down
             override fun onChannelFocusChange(channel: Channel) {
-                Timber.d("onChannelChanged: Channel changed to ${channel.imageUrl}")
+                Timber.d("onChannelChanged: Channel changed to ${channel.id}")
             }
 
             // Invoked when channel changed using CH Up/Down
             override fun onPlayingChannelChange(channel: Channel) {
-                Timber.d("OnPlayingChannelChange: Playing Channel changed to ${channel.imageUrl}")
+                Timber.d("OnPlayingChannelChange: Playing Channel changed to ${channel.id}")
+            }
+        }
+
+        programBar.onProgramChange = object : ProgramBarView.OnProgramChange {
+            override fun onProgramChanged(program: Program) {
+                Timber.d("onProgramChanged: ${program.id}")
+            }
+
+            override fun onProgramSelected(program: Program) {
+                Timber.d("onProgramSelected: ${program.id}")
+                toast("onProgramSelected : ${program.id}")
             }
         }
     }
@@ -71,7 +85,6 @@ class PlaygroundActivity : AppCompatActivity() {
             KeyEvent.KEYCODE_DPAD_UP -> {
                 chStack.channelFocusUp()
             }
-
             KeyEvent.KEYCODE_DPAD_DOWN -> {
                 if (chStack.currentState == STATE_CH_STACK_VISIBLE) {
                     chStack.channelFocusDown()
@@ -80,18 +93,12 @@ class PlaygroundActivity : AppCompatActivity() {
                     programBar.show()
                 }
             }
-
             KeyEvent.KEYCODE_DPAD_LEFT -> {
                 programBar.moveToPrevProgram()
             }
 
             KeyEvent.KEYCODE_DPAD_RIGHT -> {
                 programBar.moveToNextProgram()
-            }
-
-            KeyEvent.KEYCODE_ENTER -> {
-                Timber.d("onKeyDown: Launch ${chStack.getActiveChannel()}")
-                chStack.selectFocusedChannel()
             }
         }
         return super.onKeyDown(keyCode, event)

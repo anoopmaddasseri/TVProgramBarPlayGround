@@ -6,8 +6,6 @@ import android.view.Gravity
 import androidx.core.view.isVisible
 import androidx.leanback.widget.HorizontalGridView
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearSnapHelper
-import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.SnapHelper
 import com.bumptech.glide.Glide
 import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader
@@ -144,12 +142,12 @@ class ProgramBarView @JvmOverloads constructor(
     /**
      * To select currently focused program
      */
-    fun selectFocusedProgram() {
-        if (currentViewPosition != currentPlayingPosition) {
+    private fun selectFocusedProgram(pos: Int, program: Program) {
+        if (prevPlayingPosition != pos) {
             prevPlayingPosition = currentPlayingPosition
             // Select currently focused program
-            currentPlayingPosition = currentViewPosition
-            updateAdapterPlayingChannel()
+            currentPlayingPosition = pos
+            updateAdapterPlayingChannel(program)
             firePlayingProgramChanged()
         }
     }
@@ -193,12 +191,23 @@ class ProgramBarView @JvmOverloads constructor(
     }
 
     /**
+     * Triggered when selecting a program
+     */
+    private fun onProgramSelected(): (Int, program: Program) -> Unit =
+        { pos: Int, pgm -> selectFocusedProgram(pos, pgm) }
+
+    /**
      * Called during initial program setup
      */
     fun setupPrograms(programs: List<Program>) {
         // since we're reversed the layout, we need to reverse the channels to maintain the order
         programBarAdapter =
-            ProgramBarAdapter(context, preLoadSizeProvider, programs.toMutableList())
+            ProgramBarAdapter(
+                context,
+                preLoadSizeProvider,
+                programs.toMutableList(),
+                onProgramSelected = onProgramSelected()
+            )
 
         currentViewPosition = getCurrentIndexInMiddle()
 
@@ -239,12 +248,11 @@ class ProgramBarView @JvmOverloads constructor(
     /**
      * Called to change the playing program
      */
-    private fun updateAdapterPlayingChannel() {
-        val activeProgram = getPlayingProgram()
+    private fun updateAdapterPlayingChannel(activeProgram: Program) {
         val prevProgram = programBarAdapter!!.programs[prevPlayingPosition]
 
         // Update model first
-        activeProgram?.isPlaying = true
+        activeProgram.isPlaying = true
         prevProgram.isPlaying = false
 
         // Now update UI
