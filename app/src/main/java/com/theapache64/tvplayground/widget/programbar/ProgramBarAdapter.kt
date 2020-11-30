@@ -96,8 +96,6 @@ class ProgramBarAdapter(
             view.clearAnimation()
             if (hasFocus) {
                 runScaleAnimation(view)
-            } else {
-                runScaleAnimation(view, false)
             }
         }
 
@@ -117,19 +115,11 @@ class ProgramBarAdapter(
         (vh as? ViewHolder)?.onFocusRequestReceived()
     }
 
-    private fun runScaleAnimation(view: View, scaleIn: Boolean = true) {
-        if (scaleIn) {
-            // run scale animation and make it bigger
-            val scaleInAnim =
-                AnimationUtils.loadAnimation(context, R.anim.scale_in) as ScaleAnimation
-            view.startAnimation(scaleInAnim)
-            scaleInAnim.fillAfter = true
-        } else {
-            // run scale animation and make it smaller
-            val scaleOutAnim =
-                AnimationUtils.loadAnimation(context, R.anim.scale_out) as ScaleAnimation
-            view.startAnimation(scaleOutAnim)
-            scaleOutAnim.fillAfter = true
-        }
+    private fun runScaleAnimation(view: View) {
+        // run scale animation and make it bigger
+        val scaleInAnim =
+            AnimationUtils.loadAnimation(context, R.anim.scale_in) as ScaleAnimation
+        view.startAnimation(scaleInAnim)
+        scaleInAnim.fillAfter = true
     }
 }
