@@ -58,7 +58,6 @@ class ProgramBarView @JvmOverloads constructor(
     }
 
     init {
-        layoutManager = LinearLayoutManager(context, HORIZONTAL, false)
         itemAnimator = null
 
         // Snap item center always
@@ -105,7 +104,6 @@ class ProgramBarView @JvmOverloads constructor(
      */
     fun moveToNextProgram() {
         if (canMoveNext()) {
-            gainFocus()
             prevViewPosition = currentViewPosition
             scrollToPosition(++currentViewPosition)
             updateAdapterProgramFocus()
@@ -121,7 +119,6 @@ class ProgramBarView @JvmOverloads constructor(
      */
     fun moveToPrevProgram() {
         if (canMovePrev()) {
-            gainFocus()
             prevViewPosition = currentViewPosition
             scrollToPosition(--currentViewPosition)
             updateAdapterProgramFocus()
@@ -218,8 +215,8 @@ class ProgramBarView @JvmOverloads constructor(
 
         // At this point, both view position are same, because channelUp/Down didn't happen
         currentPlayingPosition = currentViewPosition
-
-        setupPreloading()
+        // TODO: 30-11-2020 Grid layout manager preloading setup
+        // setupPreloading()
         adapter = programBarAdapter
 
         // Scrolling to mid position

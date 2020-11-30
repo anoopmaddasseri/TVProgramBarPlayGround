@@ -93,6 +93,7 @@ class ProgramBarAdapter(
 
     private val focusChangeListener =
         View.OnFocusChangeListener { view, hasFocus ->
+            view.clearAnimation()
             if (hasFocus) {
                 runScaleAnimation(view)
             } else {
