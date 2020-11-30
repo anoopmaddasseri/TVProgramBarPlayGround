@@ -21,7 +21,7 @@ class PlaygroundViewModel : ViewModel() {
             repeat(300) {
                 add(
                     Channel(
-                        "id-$it",
+                        "id $it",
                         it,
                         "https://picsum.photos/id/$it/200/200",
                         it == 0,
@@ -37,7 +37,7 @@ class PlaygroundViewModel : ViewModel() {
             repeat(100) {
                 add(
                     Program(
-                        "Pgm-$it",
+                        "Pgm $it",
                         it,
                         "https://picsum.photos/id/$it/200/200",
                         isActive = false,

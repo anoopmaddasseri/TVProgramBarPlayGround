@@ -1,4 +1,4 @@
 <resources>
 
-    <style name="Theme.TVPlayground" parent="@style/Theme.AppCompat.NoActionBar" />
+    <style name="Theme.TVPlayground" parent="Theme.MaterialComponents.NoActionBar" />
 </resources>

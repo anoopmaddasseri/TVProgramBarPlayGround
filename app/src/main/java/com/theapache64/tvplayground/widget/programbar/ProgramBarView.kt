@@ -2,15 +2,12 @@ package com.theapache64.tvplayground.widget.programbar
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.Gravity
 import androidx.core.view.isVisible
 import androidx.leanback.widget.HorizontalGridView
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.SnapHelper
 import com.bumptech.glide.Glide
 import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader
 import com.bumptech.glide.util.ViewPreloadSizeProvider
-import com.github.rubensousa.gravitysnaphelper.GravitySnapHelper
 
 /**
  * Created by Anoop Maddasseri : Nov 29 Sun,2020 @ 09:17
@@ -59,10 +56,6 @@ class ProgramBarView @JvmOverloads constructor(
 
     init {
         itemAnimator = null
-
-        // Snap item center always
-        val snapHelper: SnapHelper = GravitySnapHelper(Gravity.CENTER)
-        snapHelper.attachToRecyclerView(this)
     }
 
     /**
@@ -233,13 +226,6 @@ class ProgramBarView @JvmOverloads constructor(
 
         activeProgram?.isActive = true
         prevProgram.isActive = false
-
-        // Prev. pgm state update
-        if (prevViewPosition > NO_POSITION) {
-            programBarAdapter?.notifyItemChanged(prevViewPosition)
-        }
-
-        programBarAdapter?.notifyItemChanged(currentViewPosition)
     }
 
     /**
