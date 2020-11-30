@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader
 import com.bumptech.glide.util.ViewPreloadSizeProvider
+import timber.log.Timber
 
 /**
  * Created by Anoop Maddasseri : Nov 29 Sun,2020 @ 09:17
@@ -17,6 +18,8 @@ class ProgramBarView @JvmOverloads constructor(
 ) : HorizontalGridView(context, attrs, defStyleAttr) {
 
     companion object {
+        private const val TAG = "ProgramBarView"
+
         // Glide program icon preload count
         private const val PRELOAD_COUNT = 50
         private const val OFFSET_DEFAULT = 0
@@ -24,6 +27,9 @@ class ProgramBarView @JvmOverloads constructor(
         // Stack show / hide
         private const val FADE_IN_DURATION = 500L
         private const val FADE_OUT_DURATION = 200L
+
+        // Activity capture
+        private const val DELAY_ACTIVITY_INTERCEPT = 100L
     }
 
     // Focused program state
@@ -39,6 +45,9 @@ class ProgramBarView @JvmOverloads constructor(
 
     // Program stack state
     var currentState = StateProgramStack.STATE_PGM_STACK_GONE
+
+    // Interception
+    var activityCaptureTime = 0L
 
     enum class StateProgramStack {
         STATE_PGM_STACK_VISIBLE,
@@ -97,6 +106,7 @@ class ProgramBarView @JvmOverloads constructor(
      */
     fun moveToNextProgram() {
         if (canMoveNext()) {
+            activityCaptureTime = System.currentTimeMillis()
             prevViewPosition = currentViewPosition
             scrollToPosition(++currentViewPosition)
             updateAdapterProgramFocus()
@@ -104,19 +114,30 @@ class ProgramBarView @JvmOverloads constructor(
         }
     }
 
-    private fun canMoveNext() =
-        currentViewPosition.inc() < programBarAdapter?.itemCount ?: OFFSET_DEFAULT
-
     /**
      * To move focus to previous program.
      */
     fun moveToPrevProgram() {
         if (canMovePrev()) {
+            activityCaptureTime = System.currentTimeMillis()
             prevViewPosition = currentViewPosition
             scrollToPosition(--currentViewPosition)
             updateAdapterProgramFocus()
             fireProgramFocusChanged()
         }
+    }
+
+    private fun canMoveNext() =
+        currentViewPosition.inc() < programBarAdapter?.itemCount ?: OFFSET_DEFAULT && allowKeyEvent()
+
+    private fun canMovePrev() =
+        currentViewPosition > OFFSET_DEFAULT && allowKeyEvent()
+
+    private fun allowKeyEvent(): Boolean {
+        val allowKeyEvent =
+            System.currentTimeMillis().minus(activityCaptureTime) > DELAY_ACTIVITY_INTERCEPT
+        Timber.tag(TAG).d("allowKeyEvent : $allowKeyEvent")
+        return allowKeyEvent
     }
 
     /**
@@ -126,8 +147,6 @@ class ProgramBarView @JvmOverloads constructor(
         if (hasFocus().not()) requestChildFocus()
     }
 
-    private fun canMovePrev() =
-        currentViewPosition > OFFSET_DEFAULT
 
     /**
      * To select currently focused program

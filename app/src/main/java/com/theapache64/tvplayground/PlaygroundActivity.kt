@@ -81,6 +81,7 @@ class PlaygroundActivity : AppCompatActivity() {
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         Timber.d("onKeyDown: $keyCode")
+        var shouldIntercept = false
         when (keyCode) {
             KeyEvent.KEYCODE_DPAD_UP -> {
                 chStack.channelFocusUp()
@@ -95,13 +96,15 @@ class PlaygroundActivity : AppCompatActivity() {
             }
             KeyEvent.KEYCODE_DPAD_LEFT -> {
                 programBar.moveToPrevProgram()
+                shouldIntercept = true
             }
 
             KeyEvent.KEYCODE_DPAD_RIGHT -> {
                 programBar.moveToNextProgram()
+                shouldIntercept = true
             }
         }
-        return super.onKeyDown(keyCode, event)
+        return shouldIntercept
     }
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
