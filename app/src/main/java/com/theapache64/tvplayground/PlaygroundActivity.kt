@@ -65,6 +65,15 @@ class PlaygroundActivity : AppCompatActivity() {
                 toast("onProgramSelected : ${program.id}")
             }
         }
+
+        programBar.onPagingStateChange = object : ProgramBarView.PagingStateChange {
+            override fun onPagingStateChanged(
+                startAt: Long?,
+                state: ProgramBarView.StatePgmPaging
+            ) {
+                toast("onPagingStateChanged : $state")
+            }
+        }
     }
 
     private fun attachObservers(viewModel: PlaygroundViewModel) {

@@ -30,6 +30,9 @@ class ProgramBarView @JvmOverloads constructor(
 
         // Activity capture
         private const val DELAY_ACTIVITY_INTERCEPT = 100L
+
+        // Paging trigger threshold
+        private const val PAGING_TRIGGER_THRESHOLD = 2
     }
 
     // Focused program state
@@ -46,8 +49,14 @@ class ProgramBarView @JvmOverloads constructor(
     // Program stack state
     var currentState = StateProgramStack.STATE_PGM_STACK_GONE
 
+    // Program paging events
+    var onPagingStateChange: PagingStateChange? = null
+
+    // Program paging state
+    var currentPgmPagingState = StatePgmPaging.STATE_PAGING_NONE
+
     // Interception
-    var activityCaptureTime = 0L
+    private var activityCaptureTime = 0L
 
     // Misc
     private val mPrograms: List<Program>?
@@ -56,6 +65,12 @@ class ProgramBarView @JvmOverloads constructor(
     enum class StateProgramStack {
         STATE_PGM_STACK_VISIBLE,
         STATE_PGM_STACK_GONE
+    }
+
+    enum class StatePgmPaging {
+        STATE_PAGING_NONE,
+        STATE_PAGING_START,
+        STATE_PAGING_END
     }
 
     // Component init goes here 👇
@@ -110,6 +125,10 @@ class ProgramBarView @JvmOverloads constructor(
             scrollToPosition(++currentViewPosition)
             updateAdapterProgramFocus()
             fireProgramFocusChanged()
+
+            // Paging state change based on the threshold
+            val pagingThreshPos = mPrograms?.count()?.minus(PAGING_TRIGGER_THRESHOLD)
+            firePagingStateChanged(pagingThreshPos, StatePgmPaging.STATE_PAGING_END)
         }
     }
 
@@ -123,6 +142,9 @@ class ProgramBarView @JvmOverloads constructor(
             scrollToPosition(--currentViewPosition)
             updateAdapterProgramFocus()
             fireProgramFocusChanged()
+
+            // Paging state change based on the threshold
+            firePagingStateChanged(PAGING_TRIGGER_THRESHOLD, StatePgmPaging.STATE_PAGING_START)
         }
     }
 
@@ -305,6 +327,16 @@ class ProgramBarView @JvmOverloads constructor(
         }
     }
 
+    private fun firePagingStateChanged(pagingThreshPos: Int?, pagingState: StatePgmPaging) {
+        if (currentViewPosition == pagingThreshPos) {
+            currentPgmPagingState = pagingState
+            onPagingStateChange?.onPagingStateChanged(
+                mPrograms!![currentViewPosition].startAt,
+                pagingState
+            )
+        }
+    }
+
     interface OnProgramChange {
         /**
          * Invoked when program changed using DPAD LEFT/RIGHT
@@ -315,5 +347,12 @@ class ProgramBarView @JvmOverloads constructor(
          * Invoked when program selected
          */
         fun onProgramSelected(program: Program)
+    }
+
+    interface PagingStateChange {
+        /**
+         * Invoked when program paging state changed
+         */
+        fun onPagingStateChanged(startAt: Long?, state: StatePgmPaging)
     }
 }

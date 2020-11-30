@@ -8,5 +8,6 @@ data class Program(
     val title: Int,
     val imageUrl: String,
     var isActive: Boolean,
-    var isPlaying: Boolean
+    var isPlaying: Boolean,
+    var startAt: Long? = null
 )
