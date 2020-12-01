@@ -2,4 +2,5 @@
 <resources>
     <item name="focus_scaled_percentage" type="dimen">115%</item>
     <item name="click_scaled_percentage" type="dimen">105%</item>
+    <dimen name="program_bar_hint_translation">150dp</dimen>
 </resources>

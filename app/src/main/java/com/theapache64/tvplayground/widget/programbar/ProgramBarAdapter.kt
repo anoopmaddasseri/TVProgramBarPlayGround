@@ -99,21 +99,21 @@ class ProgramBarAdapter(
             }
         }
 
-        fun onFocusRequestReceived() {
-            binding.clProgramBar.requestFocus()
+        fun clearChildFocus() {
+            binding.clProgramBar.clearAnimation()
+        }
+
+        fun requestChildFocus() {
+            runScaleAnimation(binding.clProgramBar)
         }
     }
 
-    fun onFocusRequestReceived(vh: RecyclerView.ViewHolder?) {
-        (vh as? ViewHolder)?.onFocusRequestReceived()
+    fun requestChildFocus(vh: RecyclerView.ViewHolder?) {
+        (vh as? ViewHolder)?.requestChildFocus()
     }
 
-    private fun runScaleAnimation(view: View) {
-        // run scale animation and make it bigger
-        val scaleInAnim =
-            AnimationUtils.loadAnimation(context, R.anim.scale_in) as ScaleAnimation
-        view.startAnimation(scaleInAnim)
-        scaleInAnim.fillAfter = true
+    fun clearChildFocus(vh: RecyclerView.ViewHolder?) {
+        (vh as? ViewHolder)?.clearChildFocus()
     }
 
     private val focusChangeListener =
@@ -123,6 +123,14 @@ class ProgramBarAdapter(
                 runScaleAnimation(view)
             }
         }
+
+    private fun runScaleAnimation(view: View) {
+        // run scale animation and make it bigger
+        val scaleInAnim =
+            AnimationUtils.loadAnimation(context, R.anim.scale_in) as ScaleAnimation
+        view.startAnimation(scaleInAnim)
+        scaleInAnim.fillAfter = true
+    }
 
     inner class ProgramItemDiffCallback(
         private val newItems: List<Program>,

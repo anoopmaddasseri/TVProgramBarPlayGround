@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader
 import com.bumptech.glide.util.ViewPreloadSizeProvider
+import com.theapache64.tvplayground.R
 import timber.log.Timber
 
 /**
@@ -63,6 +64,7 @@ class ProgramBarView @JvmOverloads constructor(
         get() = programBarAdapter?.programs
 
     enum class StateProgramStack {
+        STATE_PGM_STACK_HINT_VISIBLE,
         STATE_PGM_STACK_VISIBLE,
         STATE_PGM_STACK_GONE
     }
@@ -149,10 +151,10 @@ class ProgramBarView @JvmOverloads constructor(
     }
 
     private fun canMoveNext() =
-        currentViewPosition.inc() < mPrograms?.count() ?: OFFSET_DEFAULT && allowKeyEvent()
+        currentViewPosition.inc() < mPrograms?.count() ?: OFFSET_DEFAULT && allowKeyEvent() && currentState == StateProgramStack.STATE_PGM_STACK_VISIBLE
 
     private fun canMovePrev() =
-        currentViewPosition > OFFSET_DEFAULT && allowKeyEvent()
+        currentViewPosition > OFFSET_DEFAULT && allowKeyEvent() && currentState == StateProgramStack.STATE_PGM_STACK_VISIBLE
 
     private fun allowKeyEvent(): Boolean {
         val allowKeyEvent =
@@ -160,14 +162,6 @@ class ProgramBarView @JvmOverloads constructor(
         Timber.tag(TAG).d("allowKeyEvent : $allowKeyEvent")
         return allowKeyEvent
     }
-
-    /**
-     * Gain focus back to program bar
-     */
-    private fun gainFocus() {
-        if (hasFocus().not()) requestChildFocus()
-    }
-
 
     /**
      * To select currently focused program
@@ -189,8 +183,15 @@ class ProgramBarView @JvmOverloads constructor(
         isVisible = true
         animate().cancel()
         animate().alpha(1f).duration = FADE_IN_DURATION
-        currentState = StateProgramStack.STATE_PGM_STACK_VISIBLE
-        gainFocus()
+        if (currentState == StateProgramStack.STATE_PGM_STACK_HINT_VISIBLE) {
+            translationY = 0f
+            currentState = StateProgramStack.STATE_PGM_STACK_VISIBLE
+            requestChildFocus()
+        } else {
+            translationY = resources.getDimension(R.dimen.program_bar_hint_translation)
+            currentState = StateProgramStack.STATE_PGM_STACK_HINT_VISIBLE
+            clearChildFocus()
+        }
     }
 
     /**
@@ -247,13 +248,12 @@ class ProgramBarView @JvmOverloads constructor(
 
         // At this point, both view position are same, because channelUp/Down didn't happen
         currentPlayingPosition = currentViewPosition
-        // TODO: 30-11-2020 Grid layout manager preloading setup
+        // TODO: 30-11-2020 Grid layout manager glide preloading setup
         // setupPreloading()
         adapter = programBarAdapter
 
         // Scrolling to mid position
         scrollToPosition(currentViewPosition)
-        requestChildFocus()
     }
 
     /**
@@ -348,9 +348,18 @@ class ProgramBarView @JvmOverloads constructor(
     /**
      * Request focus to specific vh child
      */
-    fun requestChildFocus(holderPos: Int = currentViewPosition) {
+    private fun requestChildFocus(holderPos: Int = currentViewPosition) {
         post {
-            programBarAdapter!!.onFocusRequestReceived(findViewHolderForAdapterPosition(holderPos))
+            programBarAdapter!!.requestChildFocus(findViewHolderForAdapterPosition(holderPos))
+        }
+    }
+
+    /**
+     * Clear focus from specific vh child
+     */
+    private fun clearChildFocus(holderPos: Int = currentViewPosition) {
+        post {
+            programBarAdapter?.clearChildFocus(findViewHolderForAdapterPosition(holderPos))
         }
     }
 

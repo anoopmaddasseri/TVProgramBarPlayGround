@@ -1,6 +1,7 @@
 package com.theapache64.tvplayground
 
 import android.os.Bundle
+import android.os.Handler
 import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -9,13 +10,16 @@ import com.theapache64.tvplayground.databinding.ActivityPlaygroundBinding
 import com.theapache64.tvplayground.utils.toast
 import com.theapache64.tvplayground.widget.channelstack.Channel
 import com.theapache64.tvplayground.widget.channelstack.ChannelStackView
-import com.theapache64.tvplayground.widget.channelstack.ChannelStackView.StateChStack.STATE_CH_STACK_VISIBLE
+import com.theapache64.tvplayground.widget.channelstack.ChannelStackView.StateChStack
 import com.theapache64.tvplayground.widget.programbar.Program
 import com.theapache64.tvplayground.widget.programbar.ProgramBarView
+import com.theapache64.tvplayground.widget.programbar.ProgramBarView.StateProgramStack
 import timber.log.Timber
 
 class PlaygroundActivity : AppCompatActivity() {
 
+    // TODO: 01-12-2020 Auto hide mocking, remove
+    private val chStackAutoHideMocker = Handler()
     private lateinit var binding: ActivityPlaygroundBinding
 
     private val chStack by lazy {
@@ -90,17 +94,17 @@ class PlaygroundActivity : AppCompatActivity() {
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         Timber.d("onKeyDown: $keyCode")
+        scheduleChStackAutoHide()
         var shouldIntercept = false
         when (keyCode) {
             KeyEvent.KEYCODE_DPAD_UP -> {
                 chStack.channelFocusUp()
             }
             KeyEvent.KEYCODE_DPAD_DOWN -> {
-                if (chStack.currentState == STATE_CH_STACK_VISIBLE) {
-                    chStack.channelFocusDown()
+                if (chStack.currentState != StateChStack.STATE_CH_STACK_VISIBLE) {
+                    channelPgmStackState()
                 } else {
-                    chStack.show()
-                    programBar.show()
+                    chStack.channelFocusDown()
                 }
             }
             KeyEvent.KEYCODE_DPAD_LEFT -> {
@@ -118,6 +122,7 @@ class PlaygroundActivity : AppCompatActivity() {
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
         Timber.d("keyCode: $keyCode")
+        scheduleChStackAutoHide()
         when (keyCode) {
             KeyEvent.KEYCODE_PAGE_UP, KeyEvent.KEYCODE_CHANNEL_UP -> {
                 chStack.channelUp()
@@ -130,4 +135,23 @@ class PlaygroundActivity : AppCompatActivity() {
         return super.onKeyDown(keyCode, event)
     }
 
+    private fun channelPgmStackState() {
+        programBar.show()
+        if (programBar.currentState == StateProgramStack.STATE_PGM_STACK_VISIBLE) {
+            chStack.show()
+            scheduleChStackAutoHide()
+        }
+    }
+
+    private fun hideChannelStack() {
+        programBar.hide()
+        chStack.hide()
+    }
+
+    private fun scheduleChStackAutoHide() {
+        chStackAutoHideMocker.removeCallbacksAndMessages(null)
+        chStackAutoHideMocker.postDelayed(chStackAutoHideRun(), 4000)
+    }
+
+    private fun chStackAutoHideRun(): () -> Unit = { hideChannelStack() }
 }
