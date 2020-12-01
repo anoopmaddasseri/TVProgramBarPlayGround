@@ -282,6 +282,21 @@ class ProgramBarView @JvmOverloads constructor(
     }
 
     /**
+     * Reset program bar states
+     */
+    private fun reset() {
+        currentPgmPagingState = StatePgmPaging.STATE_PAGING_NONE
+
+        // Reset focused program state
+        prevViewPosition = NO_POSITION
+        currentViewPosition = NO_POSITION
+
+        // Reset playing program state
+        currentPlayingPosition = NO_POSITION
+        prevPlayingPosition = NO_POSITION
+    }
+
+    /**
      * Called to change the focused program
      */
     private fun updateAdapterProgramFocus() {
