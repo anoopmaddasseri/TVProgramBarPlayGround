@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.view.animation.ScaleAnimation
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.ListPreloader
 import com.bumptech.glide.Priority
@@ -24,7 +25,7 @@ import com.theapache64.tvplayground.utils.GlideRequest
 class ProgramBarAdapter(
     private val context: Context,
     private val preloadSizeProvider: ViewPreloadSizeProvider<Program>,
-    val programs: MutableList<Program>,
+    var programs: MutableList<Program>,
     var onProgramSelected: (position: Int, program: Program) -> Unit
 ) : RecyclerView.Adapter<ProgramBarAdapter.ViewHolder>(),
     ListPreloader.PreloadModelProvider<Program> {
@@ -70,6 +71,18 @@ class ProgramBarAdapter(
         holder.bind(holder.layoutPosition, program)
     }
 
+    override fun getItemCount() = programs.count()
+
+    /**
+     * Diff util update
+     */
+    fun update(newSetPrograms: MutableList<Program>) {
+        val diffCallback = ProgramItemDiffCallback(newSetPrograms, programs)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+        programs = newSetPrograms
+        diffResult.dispatchUpdatesTo(this)
+    }
+
     inner class ViewHolder(val binding: ItemProgramBarBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
@@ -91,26 +104,6 @@ class ProgramBarAdapter(
         }
     }
 
-    private val focusChangeListener =
-        View.OnFocusChangeListener { view, hasFocus ->
-            view.clearAnimation()
-            if (hasFocus) {
-                runScaleAnimation(view)
-            }
-        }
-
-    override fun getPreloadItems(viewPosition: Int): MutableList<Program> {
-        return mutableListOf(programs[viewPosition])
-    }
-
-    override fun getPreloadRequestBuilder(item: Program): RequestBuilder<*>? {
-        return fullRequest
-            .thumbnail(thumbRequest.load(item.imageUrl))
-            .load(item.imageUrl)
-    }
-
-    override fun getItemCount() = programs.count()
-
     fun onFocusRequestReceived(vh: RecyclerView.ViewHolder?) {
         (vh as? ViewHolder)?.onFocusRequestReceived()
     }
@@ -122,4 +115,45 @@ class ProgramBarAdapter(
         view.startAnimation(scaleInAnim)
         scaleInAnim.fillAfter = true
     }
+
+    private val focusChangeListener =
+        View.OnFocusChangeListener { view, hasFocus ->
+            view.clearAnimation()
+            if (hasFocus) {
+                runScaleAnimation(view)
+            }
+        }
+
+    inner class ProgramItemDiffCallback(
+        private val newItems: List<Program>,
+        private val oldItems: List<Program>
+    ) : DiffUtil.Callback() {
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            val oldItem = oldItems[oldItemPosition]
+            val newItem = newItems[newItemPosition]
+            return oldItem.id == newItem.id
+        }
+
+        override fun getOldListSize(): Int = oldItems.size
+
+        override fun getNewListSize(): Int = newItems.size
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            val oldItem = oldItems[oldItemPosition]
+            val newItem = newItems[newItemPosition]
+            return oldItem.startAt == newItem.startAt && oldItem.endAt == newItem.startAt
+        }
+    }
+
+    override fun getPreloadItems(viewPosition: Int): MutableList<Program> {
+        return mutableListOf(programs[viewPosition])
+    }
+
+    override fun getPreloadRequestBuilder(item: Program): RequestBuilder<*>? {
+        return fullRequest
+            .thumbnail(thumbRequest.load(item.imageUrl))
+            .load(item.imageUrl)
+    }
+
 }

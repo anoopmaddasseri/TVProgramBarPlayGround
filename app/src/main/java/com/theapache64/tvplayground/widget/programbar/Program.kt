@@ -9,5 +9,6 @@ data class Program(
     val imageUrl: String,
     var isActive: Boolean,
     var isPlaying: Boolean,
-    var startAt: Long? = null
+    var startAt: Long? = null,
+    var endAt: Long? = null,
 )

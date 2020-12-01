@@ -230,7 +230,6 @@ class ProgramBarView @JvmOverloads constructor(
      * Called during initial program setup
      */
     fun setupPrograms(programs: List<Program>) {
-        // since we're reversed the layout, we need to reverse the channels to maintain the order
         programBarAdapter =
             ProgramBarAdapter(
                 context,
@@ -255,6 +254,31 @@ class ProgramBarView @JvmOverloads constructor(
         // Scrolling to mid position
         scrollToPosition(currentViewPosition)
         requestChildFocus()
+    }
+
+    /**
+     * Update programs based on the current state
+     */
+    fun update(programs: List<Program>) {
+        Timber.tag(TAG)
+            .d("Paging state: $currentPgmPagingState | programs: ${programs.size}")
+        var programsNewSet = mPrograms?.toMutableList()
+        when (currentPgmPagingState) {
+            StatePgmPaging.STATE_PAGING_START -> {
+                // Programs goes to the start
+                programsNewSet?.addAll(0, programs)
+            }
+            StatePgmPaging.STATE_PAGING_END -> {
+                // Programs goes to the end
+                programsNewSet?.addAll(programs)
+            }
+            else -> {
+                // Afresh state, replace with program set
+                programsNewSet = programs.toMutableList()
+            }
+        }
+
+        programBarAdapter?.update(programsNewSet!!)
     }
 
     /**
