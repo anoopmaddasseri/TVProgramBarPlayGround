@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.view.animation.ScaleAnimation
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.ListPreloader
@@ -93,6 +94,8 @@ class ProgramBarAdapter(
             fullRequest.load(program.imageUrl)
                 .thumbnail(thumbRequest.load(program.imageUrl))
                 .into(binding.ivProgramLogo)
+
+            binding.programId.isVisible = program.isActive
 
             binding.clProgramBar.setOnClickListener {
                 onProgramSelected(pos, program)

@@ -337,6 +337,12 @@ class ProgramBarView @JvmOverloads constructor(
 
         activeProgram?.isActive = true
         prevProgram.isActive = false
+
+        // Now update UI
+        if (prevViewPosition > NO_POSITION) {
+            programBarAdapter?.notifyItemChanged(prevViewPosition)
+        }
+        programBarAdapter?.notifyItemChanged(currentViewPosition)
     }
 
     /**
