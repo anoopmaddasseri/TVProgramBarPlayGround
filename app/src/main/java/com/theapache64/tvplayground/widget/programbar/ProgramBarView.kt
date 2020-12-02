@@ -310,7 +310,7 @@ class ProgramBarView @JvmOverloads constructor(
     /**
      * Reset program bar states
      */
-    fun reset(targetPlayingCh: Boolean = false) {
+    fun reset(targetPlayingCh: Boolean = false, resetPlaying: Boolean = false) {
         currentPgmPagingState = StatePgmPaging.STATE_PAGING_NONE
 
         // Reset focused program state
@@ -319,6 +319,9 @@ class ProgramBarView @JvmOverloads constructor(
 
         // Reset playing position
         prevPlayingPosition = NO_POSITION
+        if (resetPlaying) {
+            currentPlayingPosition = NO_POSITION
+        }
 
         mTargetPlayingCh = targetPlayingCh
     }

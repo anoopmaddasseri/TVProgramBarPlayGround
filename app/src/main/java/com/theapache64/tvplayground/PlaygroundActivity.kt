@@ -58,6 +58,9 @@ class PlaygroundActivity : AppCompatActivity() {
             // Invoked when channel changed using CH Up/Down
             override fun onPlayingChannelChange(channel: Channel) {
                 Timber.d("OnPlayingChannelChange: Playing Channel changed to ${channel.id}")
+                programBar.reset(targetPlayingCh = true, resetPlaying = true)
+                // Request to fetch fake programs
+                viewModel.fetchFakePrograms(channel)
             }
         }
 
@@ -175,7 +178,7 @@ class PlaygroundActivity : AppCompatActivity() {
 
     private fun scheduleChStackAutoHide() {
         chStackAutoHideMocker.removeCallbacksAndMessages(null)
-        chStackAutoHideMocker.postDelayed(chStackAutoHideRun(), 4000)
+        chStackAutoHideMocker.postDelayed(chStackAutoHideRun(), 8000)
     }
 
     private fun chStackAutoHideRun(): () -> Unit = { hideChannelStack() }
