@@ -20,6 +20,7 @@ class PlaygroundActivity : AppCompatActivity() {
 
     // TODO: 01-12-2020 Auto hide mocking, remove
     private val chStackAutoHideMocker = Handler()
+    private val chDelayProgramBarReq = Handler()
     private lateinit var binding: ActivityPlaygroundBinding
 
     private lateinit var viewModel: PlaygroundViewModel
@@ -50,17 +51,13 @@ class PlaygroundActivity : AppCompatActivity() {
             // Invoked when channel changed using DPAD Up/Down
             override fun onChannelFocusChange(channel: Channel) {
                 Timber.d("onChannelChanged: Channel changed to ${channel.id}")
-                programBar.reset(chStack.isPlayingChannelFocused())
-                // Request to fetch fake programs
-                viewModel.fetchFakePrograms(channel)
+                scheduleProgramFetch(channel, chStack.isPlayingChannelFocused(), requestDelay = 200)
             }
 
             // Invoked when channel changed using CH Up/Down
             override fun onPlayingChannelChange(channel: Channel) {
                 Timber.d("OnPlayingChannelChange: Playing Channel changed to ${channel.id}")
-                programBar.reset(targetPlayingCh = true, changePlaying = true)
-                // Request to fetch fake programs
-                viewModel.fetchFakePrograms(channel)
+                scheduleProgramFetch(channel, isTargetPlayingChange = true, isChannelChange = true)
             }
         }
 
@@ -184,6 +181,23 @@ class PlaygroundActivity : AppCompatActivity() {
     private fun scheduleChStackAutoHide() {
         chStackAutoHideMocker.removeCallbacksAndMessages(null)
         chStackAutoHideMocker.postDelayed(chStackAutoHideRun(), 8000)
+    }
+
+    private fun scheduleProgramFetch(
+        channel: Channel,
+        isTargetPlayingChange: Boolean = false,
+        isChannelChange: Boolean = false,
+        requestDelay: Long = 0
+    ) {
+        chDelayProgramBarReq.removeCallbacksAndMessages(null)
+        // Request to fetch fake programs
+        chDelayProgramBarReq.postDelayed({
+            programBar.reset(
+                targetPlayingCh = isTargetPlayingChange,
+                changePlaying = isChannelChange
+            )
+            viewModel.fetchFakePrograms(channel)
+        }, requestDelay)
     }
 
     private fun chStackAutoHideRun(): () -> Unit = { hideChannelStack() }
