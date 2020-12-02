@@ -176,12 +176,18 @@ class ProgramBarView @JvmOverloads constructor(
      * To select currently focused program
      */
     private fun selectFocusedProgram(pos: Int, program: Program) {
-        if (prevPlayingPosition != pos) {
-            prevPlayingPosition = currentPlayingPosition
+        // Let the playing program change if the currently focused channel not playing one
+        if (currentPlayingPosition != pos || mTargetPlayingCh.not()) {
+            // New channel initial program selection, reset prev playing
+            prevPlayingPosition =
+                if (mTargetPlayingCh.not()) NO_POSITION else currentPlayingPosition
             // Select currently focused program
             currentPlayingPosition = pos
-            updateAdapterPlayingChannel(program)
+            updateAdapterPlayingProgram(program)
             firePlayingProgramChanged()
+
+            // Select focused channel selected
+            mTargetPlayingCh = true
         }
     }
 
@@ -274,8 +280,6 @@ class ProgramBarView @JvmOverloads constructor(
 
         // Scrolling to mid position
         scrollToPosition(currentViewPosition)
-
-        mTargetPlayingCh = false
     }
 
     /**
@@ -313,6 +317,9 @@ class ProgramBarView @JvmOverloads constructor(
         prevViewPosition = NO_POSITION
         currentViewPosition = NO_POSITION
 
+        // Reset playing position
+        prevPlayingPosition = NO_POSITION
+
         mTargetPlayingCh = targetPlayingCh
     }
 
@@ -330,12 +337,14 @@ class ProgramBarView @JvmOverloads constructor(
     /**
      * Called to change the playing program
      */
-    private fun updateAdapterPlayingChannel(activeProgram: Program) {
-        val prevProgram = mPrograms!![prevPlayingPosition]
+    private fun updateAdapterPlayingProgram(activeProgram: Program) {
+        if (prevPlayingPosition > NO_POSITION) {
+            val prevProgram = mPrograms!![prevPlayingPosition]
+            prevProgram.isPlaying = false
+        }
 
         // Update model first
         activeProgram.isPlaying = true
-        prevProgram.isPlaying = false
 
         // Now update UI
         if (prevPlayingPosition > NO_POSITION) {

@@ -69,6 +69,7 @@ class PlaygroundActivity : AppCompatActivity() {
             override fun onProgramSelected(program: Program) {
                 Timber.d("onProgramSelected: ${program.id}")
                 toast("onProgramSelected : ${program.id}")
+                chStack.selectFocusedChannel()
             }
         }
 
@@ -107,7 +108,9 @@ class PlaygroundActivity : AppCompatActivity() {
         var shouldIntercept = false
         when (keyCode) {
             KeyEvent.KEYCODE_DPAD_UP -> {
-                chStack.channelFocusUp()
+                if (chStack.currentState == StateChStack.STATE_CH_STACK_VISIBLE) {
+                    chStack.channelFocusUp()
+                }
             }
             KeyEvent.KEYCODE_DPAD_DOWN -> {
                 if (chStack.currentState != StateChStack.STATE_CH_STACK_VISIBLE) {
@@ -172,7 +175,7 @@ class PlaygroundActivity : AppCompatActivity() {
 
     private fun scheduleChStackAutoHide() {
         chStackAutoHideMocker.removeCallbacksAndMessages(null)
-        chStackAutoHideMocker.postDelayed(chStackAutoHideRun(), 5000)
+        chStackAutoHideMocker.postDelayed(chStackAutoHideRun(), 4000)
     }
 
     private fun chStackAutoHideRun(): () -> Unit = { hideChannelStack() }
