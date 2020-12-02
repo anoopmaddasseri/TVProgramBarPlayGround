@@ -203,11 +203,11 @@ class ProgramBarView @JvmOverloads constructor(
     /**
      * To show program stack
      */
-    fun show() {
+    fun show(showDirect: Boolean = false) {
         isVisible = true
         animate().cancel()
         animate().alpha(1f).duration = FADE_IN_DURATION
-        if (currentState == StateProgramStack.STATE_PGM_STACK_HINT_VISIBLE) {
+        if (currentState == StateProgramStack.STATE_PGM_STACK_HINT_VISIBLE || showDirect) {
             translationY = 0f
             currentState = StateProgramStack.STATE_PGM_STACK_VISIBLE
             requestChildFocus()
@@ -309,8 +309,10 @@ class ProgramBarView @JvmOverloads constructor(
 
     /**
      * Reset program bar states
+     * @param targetPlayingCh - true if the target channel is currently playing
+     * @param changePlaying - true if playing channel change
      */
-    fun reset(targetPlayingCh: Boolean = false, resetPlaying: Boolean = false) {
+    fun reset(targetPlayingCh: Boolean = false, changePlaying: Boolean = false) {
         currentPgmPagingState = StatePgmPaging.STATE_PAGING_NONE
 
         // Reset focused program state
@@ -319,7 +321,7 @@ class ProgramBarView @JvmOverloads constructor(
 
         // Reset playing position
         prevPlayingPosition = NO_POSITION
-        if (resetPlaying) {
+        if (changePlaying) {
             currentPlayingPosition = NO_POSITION
         }
 

@@ -58,7 +58,7 @@ class PlaygroundActivity : AppCompatActivity() {
             // Invoked when channel changed using CH Up/Down
             override fun onPlayingChannelChange(channel: Channel) {
                 Timber.d("OnPlayingChannelChange: Playing Channel changed to ${channel.id}")
-                programBar.reset(targetPlayingCh = true, resetPlaying = true)
+                programBar.reset(targetPlayingCh = true, changePlaying = true)
                 // Request to fetch fake programs
                 viewModel.fetchFakePrograms(channel)
             }
@@ -102,6 +102,11 @@ class PlaygroundActivity : AppCompatActivity() {
         viewModel.fakePrograms.observe(this, { programs ->
             Timber.d("fakePrograms: Found ${programs.size} programs")
             programBar.setupPrograms(programs)
+
+            // Show components if not already visible & when the channel change
+            if (chStack.mChangePlayingCh && chStack.currentState != StateChStack.STATE_CH_STACK_VISIBLE) {
+                channelPgmStackState(true)
+            }
         })
     }
 
@@ -150,8 +155,8 @@ class PlaygroundActivity : AppCompatActivity() {
         return super.onKeyDown(keyCode, event)
     }
 
-    private fun channelPgmStackState() {
-        programBar.show()
+    private fun channelPgmStackState(showDirect: Boolean = false) {
+        programBar.show(showDirect)
         if (programBar.currentState == StateProgramStack.STATE_PGM_STACK_VISIBLE) {
             chStack.show()
             scheduleChStackAutoHide()

@@ -45,6 +45,9 @@ class ChannelStackView @JvmOverloads constructor(
         STATE_CH_STACK_GONE
     }
 
+    // Misc
+    var mChangePlayingCh = false
+
     // Component init goes here 👇
     private var channelStackAdapter: ChannelStackAdapter? = null
     private val llm by lazy {
@@ -304,6 +307,8 @@ class ChannelStackView @JvmOverloads constructor(
      * Reset channel stack states
      */
     fun reset() {
+        mChangePlayingCh = false
+
         prevViewPosition = currentViewPosition
         currentViewPosition = currentPlayingPosition
 
@@ -345,6 +350,7 @@ class ChannelStackView @JvmOverloads constructor(
 
     private fun firePlayingChannelChanged() {
         getPlayingChannel()?.let {
+            mChangePlayingCh = true
             onChannelChange?.onPlayingChannelChange(it)
         }
     }
