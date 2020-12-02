@@ -304,8 +304,9 @@ class ChannelStackView @JvmOverloads constructor(
      * Reset channel stack states
      */
     fun reset() {
-        // Set focused program pos to currently playing
+        prevViewPosition = currentViewPosition
         currentViewPosition = currentPlayingPosition
+
         updateAdapterChannelFocus()
 
         post {
