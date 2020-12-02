@@ -16,6 +16,21 @@
         android:background="#2A2C2C"
         tools:context=".PlaygroundActivity">
 
+        <TextView
+            android:id="@+id/selected_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="25dp"
+            android:background="@android:color/white"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:padding="5dp"
+            android:textColor="@color/lb_error_background_color_translucent"
+            android:textSize="20sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <com.theapache64.tvplayground.widget.programbar.ProgramBarView
             android:id="@+id/program_bar"
             android:layout_width="0dp"

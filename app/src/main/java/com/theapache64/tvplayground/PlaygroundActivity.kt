@@ -4,9 +4,11 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.theapache64.tvplayground.databinding.ActivityPlaygroundBinding
+import com.theapache64.tvplayground.utils.runScaleAnimation
 import com.theapache64.tvplayground.utils.toast
 import com.theapache64.tvplayground.widget.channelstack.Channel
 import com.theapache64.tvplayground.widget.channelstack.ChannelStackView
@@ -68,7 +70,10 @@ class PlaygroundActivity : AppCompatActivity() {
 
             override fun onProgramSelected(program: Program) {
                 Timber.d("onProgramSelected: ${program.id}")
-                toast("onProgramSelected : ${program.id}")
+                binding.selectedItem.text = program.id
+                binding.selectedItem.isVisible = true
+                binding.selectedItem.clearAnimation()
+                binding.selectedItem.runScaleAnimation()
                 chStack.selectFocusedChannel()
             }
         }

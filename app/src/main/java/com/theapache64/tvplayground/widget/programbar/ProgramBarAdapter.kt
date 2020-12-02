@@ -5,8 +5,6 @@ import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
-import android.view.animation.ScaleAnimation
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -15,10 +13,10 @@ import com.bumptech.glide.Priority
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.util.ViewPreloadSizeProvider
-import com.theapache64.tvplayground.R
 import com.theapache64.tvplayground.databinding.ItemProgramBarBinding
 import com.theapache64.tvplayground.utils.GlideApp
 import com.theapache64.tvplayground.utils.GlideRequest
+import com.theapache64.tvplayground.utils.runScaleAnimation
 
 /**
  * Created by Anoop Maddasseri : Nov 29 Sun,2020 @ 09:17
@@ -107,7 +105,7 @@ class ProgramBarAdapter(
         }
 
         fun requestChildFocus() {
-            runScaleAnimation(binding.clProgramBar)
+            binding.clProgramBar.runScaleAnimation()
         }
     }
 
@@ -123,17 +121,9 @@ class ProgramBarAdapter(
         View.OnFocusChangeListener { view, hasFocus ->
             view.clearAnimation()
             if (hasFocus) {
-                runScaleAnimation(view)
+                view.runScaleAnimation()
             }
         }
-
-    private fun runScaleAnimation(view: View) {
-        // run scale animation and make it bigger
-        val scaleInAnim =
-            AnimationUtils.loadAnimation(context, R.anim.scale_in) as ScaleAnimation
-        view.startAnimation(scaleInAnim)
-        scaleInAnim.fillAfter = true
-    }
 
     inner class ProgramItemDiffCallback(
         private val newItems: List<Program>,
