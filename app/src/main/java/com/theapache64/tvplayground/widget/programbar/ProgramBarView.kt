@@ -63,6 +63,15 @@ class ProgramBarView @JvmOverloads constructor(
     private val mPrograms: List<Program>?
         get() = programBarAdapter?.programs
 
+    private var mTargetPlayingCh = true
+
+    private val actualPlayingPos: Int
+        get() = if (currentPlayingPosition > NO_POSITION && mTargetPlayingCh) {
+            currentPlayingPosition
+        } else {
+            getCurrentIndexInMiddle()
+        }
+
     enum class StateProgramStack {
         STATE_PGM_STACK_HINT_VISIBLE,
         STATE_PGM_STACK_VISIBLE,
@@ -177,6 +186,15 @@ class ProgramBarView @JvmOverloads constructor(
     }
 
     /**
+     * Scroll to currently playing program
+     */
+    fun scrollToPlayingProgram() {
+        if (currentPlayingPosition > NO_POSITION) {
+            scrollToPosition(currentPlayingPosition)
+        }
+    }
+
+    /**
      * To show program stack
      */
     fun show() {
@@ -238,22 +256,26 @@ class ProgramBarView @JvmOverloads constructor(
                 programs.toMutableList(),
                 onProgramSelected = onProgramSelected()
             )
-
-        currentViewPosition = getCurrentIndexInMiddle()
+        Timber.d("States : $currentViewPosition | $currentPlayingPosition | $actualPlayingPos | $mTargetPlayingCh")
+        currentViewPosition = actualPlayingPos
 
         // Active middle program TODO: 29-11-2020 'On Now' program whilst actual implementation
         if (currentViewPosition > OFFSET_DEFAULT) {
             mPrograms!![currentViewPosition].isActive = true
         }
 
-        // At this point, both view position are same, because channelUp/Down didn't happen
-        currentPlayingPosition = currentViewPosition
-        // TODO: 30-11-2020 Grid layout manager glide preloading setup
-        // setupPreloading()
+        if (mTargetPlayingCh) {
+            // At this point, both view position are same, because channelUp/Down didn't happen.
+            // Don't update playing position for channel focus change
+            currentPlayingPosition = currentViewPosition
+        }
+
         adapter = programBarAdapter
 
         // Scrolling to mid position
         scrollToPosition(currentViewPosition)
+
+        mTargetPlayingCh = false
     }
 
     /**
@@ -284,16 +306,14 @@ class ProgramBarView @JvmOverloads constructor(
     /**
      * Reset program bar states
      */
-    private fun reset() {
+    fun reset(targetPlayingCh: Boolean = false) {
         currentPgmPagingState = StatePgmPaging.STATE_PAGING_NONE
 
         // Reset focused program state
         prevViewPosition = NO_POSITION
         currentViewPosition = NO_POSITION
 
-        // Reset playing program state
-        currentPlayingPosition = NO_POSITION
-        prevPlayingPosition = NO_POSITION
+        mTargetPlayingCh = targetPlayingCh
     }
 
     /**

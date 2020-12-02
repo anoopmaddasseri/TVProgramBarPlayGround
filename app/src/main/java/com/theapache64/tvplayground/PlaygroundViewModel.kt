@@ -21,7 +21,7 @@ class PlaygroundViewModel : ViewModel() {
             repeat(300) {
                 add(
                     Channel(
-                        "id $it",
+                        "CH $it",
                         it,
                         "https://picsum.photos/id/$it/200/200",
                         it == 0,
@@ -32,12 +32,12 @@ class PlaygroundViewModel : ViewModel() {
         }
     }
 
-    fun fetchFakePrograms() {
+    fun fetchFakePrograms(channel: Channel) {
         _fakePrograms.value = mutableListOf<Program>().apply {
             repeat(100) {
                 add(
                     Program(
-                        "Pgm $it",
+                        "PGM $it ( ${channel.id} )",
                         it,
                         "https://picsum.photos/id/$it/200/200",
                         isActive = false,

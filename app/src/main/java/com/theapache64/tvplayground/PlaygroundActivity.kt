@@ -22,6 +22,8 @@ class PlaygroundActivity : AppCompatActivity() {
     private val chStackAutoHideMocker = Handler()
     private lateinit var binding: ActivityPlaygroundBinding
 
+    private lateinit var viewModel: PlaygroundViewModel
+
     private val chStack by lazy {
         binding.channelStack
     }
@@ -36,14 +38,11 @@ class PlaygroundActivity : AppCompatActivity() {
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_playground)
 
-        val viewModel = ViewModelProvider(this).get(PlaygroundViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(PlaygroundViewModel::class.java)
         binding.viewmModel = viewModel
 
         attachObservers(viewModel)
         attachCallbacks()
-
-        // Request to fetch fake programs
-        viewModel.fetchFakePrograms()
     }
 
     private fun attachCallbacks() {
@@ -51,6 +50,9 @@ class PlaygroundActivity : AppCompatActivity() {
             // Invoked when channel changed using DPAD Up/Down
             override fun onChannelFocusChange(channel: Channel) {
                 Timber.d("onChannelChanged: Channel changed to ${channel.id}")
+                programBar.reset(chStack.isPlayingChannelFocused())
+                // Request to fetch fake programs
+                viewModel.fetchFakePrograms(channel)
             }
 
             // Invoked when channel changed using CH Up/Down
@@ -84,6 +86,13 @@ class PlaygroundActivity : AppCompatActivity() {
         viewModel.fakeChannels.observe(this, { channels ->
             Timber.d("fakeChannels: Found ${channels.size} channels")
             chStack.setupChannels(channels)
+
+            // Initial programs loading
+            chStack.getPlayingChannel()?.let {
+                viewModel.fetchFakePrograms(it)
+            } ?: kotlin.run {
+                toast("No channel's found")
+            }
         })
 
         viewModel.fakePrograms.observe(this, { programs ->
@@ -145,12 +154,25 @@ class PlaygroundActivity : AppCompatActivity() {
 
     private fun hideChannelStack() {
         programBar.hide()
-        chStack.hide()
+        chStack.hide(callBack = {
+            if (chStack.currentState == StateChStack.STATE_CH_STACK_GONE) {
+                restorePbChStack()
+            }
+        })
+    }
+
+    private fun restorePbChStack() {
+        // Restore back to playing program
+        chStack.reset()
+        programBar.reset(true)
+        chStack.getPlayingChannel()?.let {
+            viewModel.fetchFakePrograms(it)
+        }
     }
 
     private fun scheduleChStackAutoHide() {
         chStackAutoHideMocker.removeCallbacksAndMessages(null)
-        chStackAutoHideMocker.postDelayed(chStackAutoHideRun(), 4000)
+        chStackAutoHideMocker.postDelayed(chStackAutoHideRun(), 5000)
     }
 
     private fun chStackAutoHideRun(): () -> Unit = { hideChannelStack() }

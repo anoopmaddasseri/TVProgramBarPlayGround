@@ -80,7 +80,7 @@ class ChannelStackView @JvmOverloads constructor(
     /**
      * To get currently playing channel
      */
-    private fun getPlayingChannel(): Channel? {
+    fun getPlayingChannel(): Channel? {
         return channelStackAdapter?.channels?.find { it.isPlaying }
     }
 
@@ -94,6 +94,11 @@ class ChannelStackView @JvmOverloads constructor(
             ) ?: OFFSET_DEFAULT
         )
     }
+
+    /**
+     * Return whether the playing channel focused
+     */
+    fun isPlayingChannelFocused() = currentViewPosition == currentPlayingPosition
 
     /**
      * To get nearest playing position in the middle
@@ -180,6 +185,15 @@ class ChannelStackView @JvmOverloads constructor(
     }
 
     /**
+     * Scroll to currently playing channel
+     */
+    private fun scrollToPlayingChannel() {
+        if (currentPlayingPosition > NO_POSITION) {
+            llm.scrollToPositionWithOffset(currentPlayingPosition, OFFSET_DEFAULT)
+        }
+    }
+
+    /**
      * To show channel stack
      */
     fun show() {
@@ -192,13 +206,14 @@ class ChannelStackView @JvmOverloads constructor(
     /**
      * To hide channel stack
      */
-    fun hide() {
+    fun hide(callBack: (() -> Unit)? = null) {
         isVisible = false
         animate().cancel()
         animate().alpha(0f).duration = FADE_OUT_DURATION
         animate().withEndAction {
             isVisible = false
             currentState = StateChStack.STATE_CH_STACK_GONE
+            callBack?.invoke()
         }
     }
 
@@ -244,13 +259,17 @@ class ChannelStackView @JvmOverloads constructor(
      */
     private fun updateAdapterChannelFocus() {
         val activeChannel = getActiveChannelFromUI()
-        val prevChannel = channelStackAdapter!!.channels[channelStackAdapter!!.getListPositionFrom(
-            prevViewPosition
-        )]
+
+        if (prevViewPosition > NO_POSITION) {
+            val prevChannel =
+                channelStackAdapter!!.channels[channelStackAdapter!!.getListPositionFrom(
+                    prevViewPosition
+                )]
+            prevChannel.isActive = false
+        }
 
         // Update model first
         activeChannel?.isActive = true
-        prevChannel.isActive = false
 
         // Now update UI
         if (prevViewPosition > NO_POSITION) {
@@ -279,6 +298,21 @@ class ChannelStackView @JvmOverloads constructor(
             channelStackAdapter?.notifyItemChanged(prevPlayingPosition)
         }
         channelStackAdapter?.notifyItemChanged(currentPlayingPosition)
+    }
+
+    /**
+     * Reset channel stack states
+     */
+    fun reset() {
+        // Set focused program pos to currently playing
+        currentViewPosition = currentPlayingPosition
+        updateAdapterChannelFocus()
+
+        post {
+            scrollToPlayingChannel()
+            // Reset focused program state
+            prevViewPosition = NO_POSITION
+        }
     }
 
     /**
