@@ -183,7 +183,6 @@ class ChannelStackView @JvmOverloads constructor(
             // Select currently focused channel
             currentPlayingPosition = currentViewPosition
             updateAdapterPlayingChannel()
-            firePlayingChannelChanged()
         }
     }
 
