@@ -53,7 +53,7 @@ class PlaygroundActivity : AppCompatActivity() {
             // Invoked when channel changed using DPAD Up/Down
             override fun onChannelFocusChange(channel: Channel) {
                 Timber.d("onChannelChanged: Channel changed to ${channel.id}")
-                scheduleProgramFetch(channel, chStack.isPlayingChannelFocused(), requestDelay = 200)
+                scheduleProgramFetch(channel, chStack.isPlayingChannelFocused(), requestDelay = 500)
             }
 
             // Invoked when channel changed using CH Up/Down
