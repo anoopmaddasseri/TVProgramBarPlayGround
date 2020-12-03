@@ -70,11 +70,8 @@ class PlaygroundActivity : AppCompatActivity() {
 
             override fun onProgramSelected(program: Program) {
                 Timber.d("onProgramSelected: ${program.id}")
-                binding.selectedItem.text = program.id
-                binding.selectedItem.isVisible = true
-                binding.selectedItem.clearAnimation()
-                binding.selectedItem.runScaleAnimation()
                 chStack.selectFocusedChannel()
+                updateSelectedProgramIndicator(program)
             }
         }
 
@@ -186,6 +183,13 @@ class PlaygroundActivity : AppCompatActivity() {
     private fun scheduleChStackAutoHide() {
         chStackAutoHideMocker.removeCallbacksAndMessages(null)
         chStackAutoHideMocker.postDelayed(chStackAutoHideRun(), 8000)
+    }
+
+    private fun updateSelectedProgramIndicator(program: Program) {
+        binding.selectedItem.text = program.id
+        binding.selectedItem.isVisible = true
+        binding.selectedItem.clearAnimation()
+        binding.selectedItem.runScaleAnimation()
     }
 
     private fun scheduleProgramFetch(
