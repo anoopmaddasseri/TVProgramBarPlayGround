@@ -127,6 +127,11 @@ class ProgramBarView @JvmOverloads constructor(
     }
 
     /**
+     * Check if the program update driven by pagination
+     */
+    fun isPaginated() = currentPgmPagingState != StatePgmPaging.STATE_PAGING_NONE
+
+    /**
      * To move focus to next program.
      */
     fun moveToNextProgram() {

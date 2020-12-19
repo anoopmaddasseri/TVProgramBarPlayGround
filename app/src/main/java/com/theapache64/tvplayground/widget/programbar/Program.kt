@@ -10,5 +10,5 @@ data class Program(
     var isActive: Boolean,
     var isPlaying: Boolean,
     var startAt: Long? = null,
-    var endAt: Long? = null,
+    var endAt: Long? = null
 )
